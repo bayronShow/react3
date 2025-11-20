@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { ROLES } from '../constants/roles';
 
 export const useAuth = () => {
-    const [role, setRoleState] = useState(null);
+    const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                const savedRole = localStorage.getItem('userRole');
-                if (savedRole) {
-                    setRoleState(savedRole);
+                const savedUser = localStorage.getItem('userData');
+                if (savedUser) {
+                    setUser(JSON.parse(savedUser));
                 }
             } catch (error) {
                 console.error('Error initializing auth:', error);
@@ -22,52 +22,78 @@ export const useAuth = () => {
         initializeAuth();
     }, []);
 
-    const setRole = (newRole) => {
-        setRoleState(newRole);
-        localStorage.setItem('userRole', newRole);
+    const login = (role, userData = {}) => {
+        const userInfo = {
+            id: Date.now(),
+            name: userData.name || getDefaultName(role),
+            email: userData.email || getDefaultEmail(role),
+            role: role,
+            organization: userData.organization || 'ТехноПром Сервис',
+            avatar: userData.avatar || getDefaultAvatar(role),
+            ...userData
+        };
+        setUser(userInfo);
+        localStorage.setItem('userData', JSON.stringify(userInfo));
     };
 
-    const removeRole = () => {
-        setRoleState(null);
-        localStorage.removeItem('userRole');
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem('userData');
     };
 
-    const getRole = () => {
-        return role;
+    const getDefaultName = (role) => {
+        const names = {
+            [ROLES.ADMIN]: 'Алексей Админов',
+            [ROLES.DIRECTOR]: 'Иван Директоров',
+            [ROLES.DISPATCHER]: 'Мария Диспетчерова',
+            [ROLES.COURIER]: 'Дмитрий Курьеров',
+            [ROLES.SPECIALIST]: 'Ольга Специалистова'
+        };
+        return names[role] || 'Пользователь';
+    };
+
+    const getDefaultEmail = (role) => {
+        return `${role.toLowerCase()}@technoprom.ru`;
+    };
+
+    const getDefaultAvatar = (role) => {
+        const avatars = {
+            [ROLES.ADMIN]: '👨‍💼',
+            [ROLES.DIRECTOR]: '👔',
+            [ROLES.DISPATCHER]: '👩‍💻',
+            [ROLES.COURIER]: '🚴',
+            [ROLES.SPECIALIST]: '👩‍🔧'
+        };
+        return avatars[role] || '👤';
     };
 
     const checkRole = (roleName) => {
-        return role === roleName;
+        return user?.role === roleName;
     };
 
     const checkAuth = () => {
-        return !!role;
-    };
-
-    const getToken = () => {
-        return 'test-token-' + Date.now();
+        return !!user;
     };
 
     const getTestUserData = () => {
-        return {
+        return user || {
             id: 1,
-            name: 'Test User',
+            name: 'Тестовый Пользователь',
             email: 'test@example.com',
-            role: role,
-            organization: 'Test Organization'
+            role: null,
+            organization: 'Тестовая Организация'
         };
     };
 
     return {
+        user,
         isAuth: checkAuth(),
         isLoading,
-        role,
-        setRole,
-        removeRole,
-        getRole,
+        login,
+        logout,
+        getRole: () => user?.role,
         checkRole,
         checkAuth,
-        getToken,
         getTestUserData
     };
 };
