@@ -1,0 +1,42 @@
+.app {
+    font-family: Arial, sans-serif;
+}
+
+.loading_bar {
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #1976d2;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: #e3f2fd;
+}
+
+/* Стили для разных ролей */
+.role-admin {
+    border-left: 4px solid #f44336;
+}
+
+.role-director {
+    border-left: 4px solid #2196f3;
+}
+
+.role-dispatcher {
+    border-left: 4px solid #4caf50;
+}
+
+.role-courier {
+    border-left: 4px solid #ff9800;
+}
+
+.role-specialist {
+    border-left: 4px solid #9c27b0;
+}
